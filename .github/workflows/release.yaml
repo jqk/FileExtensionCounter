@@ -28,6 +28,18 @@ jobs:
             goarch: amd64
 
     steps:
+      - name: Extract tag name
+        id: extract_tag
+        run: echo "::set-output name=tag_name::${{ github.ref }}"
+
+      - name: Remove tag name prefix
+        id: remove_prefix
+        run: |
+            echo "Tag name with prefix: ${{ steps.extract_tag.outputs.tag_name }}" 
+            tag_name=${{ steps.extract_tag.outputs.tag_name }}
+            tag_name=${tag_name#refs/tags/}
+            echo "::set-output name=tag_name::${tag_name}"
+        
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -49,7 +61,7 @@ jobs:
 
       - name: Packaging
         # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
-        run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.remove_prefix.outputs.tag_name }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
 
       - name: Create GitHub release from tag
         uses: softprops/action-gh-release@v1
