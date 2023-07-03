@@ -46,6 +46,10 @@ jobs:
         run: |
             echo "::set-output name=tag_name::$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')"
 
+      - name: Get version new
+        id: get_version_new
+        run: echo "program_version=${{ github.ref }} | sed 's/refs\/tags\///'" >> "$GITHUB_PROGRAM_VERSION"
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -68,7 +72,8 @@ jobs:
       - name: Packaging
         # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
         #run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.remove_prefix.outputs.tag_name }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
-        run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.get_version.outputs.tag_name }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        # run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.get_version.outputs.tag_name }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
 
       - name: Create GitHub release from tag
         uses: softprops/action-gh-release@v1
