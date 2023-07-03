@@ -48,7 +48,7 @@ jobs:
 
       - name: Get version new
         id: get_version_new
-        run: echo "program_version=${{ github.ref }} | sed 's/refs\/tags\///'" >> "$GITHUB_PROGRAM_VERSION"
+        run: echo "program_version=${{ github.ref }} | sed 's/refs\/tags\///'" >> "$GITHUB_ENV"
 
       - name: Checkout
         uses: actions/checkout@v3
