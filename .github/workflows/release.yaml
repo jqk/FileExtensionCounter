@@ -20,12 +20,14 @@ jobs:
           - goos: windows
             artifactext: ".exe"
             os: windows-latest
-            # 如果在 windows 下运行，环境变量前要加上 $Env。
-            # outputenv: "$Env:GITHUB_OUTPUT"
-            outputenv: "$GITHUB_OUTPUT"
             # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
             artifactname: "fec"
-            goarch: [amd64, arm64]
+            goarch: amd64
+          - goos: linux
+            artifactext: ""
+            os: ubuntu-latest
+            artifactname: "fec"
+            goarch: amd64
 
     steps:
       - name: Get Tag Version
