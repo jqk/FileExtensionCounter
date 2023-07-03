@@ -48,7 +48,10 @@ jobs:
 
       - name: Get version new
         id: get_version_new
-        run: echo "program_version=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_ENV
+        run: |
+            echo "Tag name is: ${{ github.ref }}"
+            echo "program_version=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_ENV
+            echo "Version is: " ${ ${{ github.ref }}#refs/tags/ }  
 
       - name: Checkout
         uses: actions/checkout@v3
