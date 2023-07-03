@@ -9,23 +9,50 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
+    strategy:
+      matrix:
+        # 定义生成目标的操作系统的相关变量，即使有重复，也要分别定义，如 goarch。
+        include:
+          - goos: windows
+            artifactext: ".exe"
+            os: windows-latest
+            # 如果在 windows 下运行，环境变量前要加上 $Env。
+            # outputenv: "$Env:GITHUB_OUTPUT"
+            outputenv: "$GITHUB_OUTPUT"
+            # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
+            artifactname: "fec"
+            goarch: amd64
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Update go.sum
         run: go mod tidy
-      
-      - name: Set up Go
+
+      - name: Setup Go
         uses: actions/setup-go@v3
         with:
-            go-version: ">=1.20.0"
-            cache: true
+          go-version: ">=1.20.0"
+          cache: true
 
       - name: Build
-        run: go build
+        run: go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+
+      - name: Packaging
+        # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
+        run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
 
       - name: Create GitHub release from tag
         uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            *.tgz
