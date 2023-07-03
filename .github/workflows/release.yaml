@@ -25,35 +25,17 @@ jobs:
             outputenv: "$GITHUB_OUTPUT"
             # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
             artifactname: "fec"
-            goarch: amd64
+            goarch: [amd64, arm64]
 
     steps:
-      - name: Extract tag name
-        id: extract_tag
-        run: echo "::set-output name=tag_name::${{ github.ref }}"
-
-      - name: Remove tag name prefix
-        id: remove_prefix
-        run: |
-            echo "Tag name with prefix: ${{ steps.extract_tag.outputs.tag_name }}" 
-            tag_name=${{ steps.extract_tag.outputs.tag_name }}
-            tag_name=${tag_name#refs/tags/}
-            echo "::set-output name=tag_name::${tag_name}"
-        
-
-      - name: Get version
-        id: get_version
-        run: |
-            echo "::set-output name=tag_name::$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')"
-
-      - name: Get version new
+      - name: Get Tag Version
         id: get_version_new
+        # 首先将  ${{ github.ref }}  的值赋给  tag_name  变量。
+        # 然后，使用字符串截取功能 tag_name=${tag_name#refs/tags/} 来移除 tag_name 中的前缀 "refs/tags/"。
+        # 最后将其保存到环境变量 program_version 中。
         run: |
             tag_name=${{ github.ref }}
             tag_name=${tag_name#refs/tags/}
-            echo "Tag name before remove prefix: ${{ github.ref }}"
-            echo "Tag name after remove prefix": ${tag_name}
-            echo "program_version2=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_ENV
             echo "program_version=${tag_name}" >> $GITHUB_ENV
 
       - name: Checkout
@@ -77,8 +59,7 @@ jobs:
 
       - name: Packaging
         # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
-        #run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.remove_prefix.outputs.tag_name }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
-        # run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.get_version.outputs.tag_name }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        # 以下针对 program_version 的警告可忽略，只要保证前面确实在环境变量中有所定义。
         run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
 
       - name: Create GitHub release from tag
