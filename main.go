@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/jqk/futool4go/fileutils"
 )
@@ -15,7 +17,7 @@ func main() {
 	argCount := len(os.Args)
 
 	if argCount == 2 {
-		if isCommand(os.Args[1]) {
+		if strings.Index(os.Args[1], "-") == 0 {
 			showHelp()
 			return
 		}
@@ -40,15 +42,51 @@ func main() {
 		path = os.Args[2]
 	}
 
-	extensions, err := fileutils.GetFileExtensions(path, caseSensitive, nil)
-	if err != nil {
-		showError("GetExtensions error", err)
-		return
+	var extensions []fileutils.FileExtension
+	var err error
+	done := make(chan struct{})
+	sleepTime := 200 * time.Millisecond
+	dirCount := 0
+	fileCount := 0
+	extCount := 0
+
+	go func() {
+		extensions, err = fileutils.GetFileExtensions(path, caseSensitive,
+			func(path string, info os.FileInfo, ext *fileutils.FileExtension) error {
+				if ext == nil {
+					dirCount++
+				} else {
+					fileCount++
+					if ext.Count == 1 {
+						extCount++
+					}
+				}
+
+				return nil
+			})
+
+		close(done)
+	}()
+
+	stepPrinted := false
+
+	for {
+		time.Sleep(sleepTime)
+
+		select {
+		case <-done:
+			if err != nil {
+				showError("GetExtensions error", err)
+				return
+			}
+			if stepPrinted {
+				fmt.Println()
+			}
+			showExtentions(path, caseSensitive, extensions)
+			return
+		default:
+			fmt.Printf("searching...   dir: %6d,  file: %7d,  ext: %5d\n", dirCount, fileCount, extCount)
+			stepPrinted = true
+		}
 	}
-
-	showExtentions(path, caseSensitive, extensions)
-}
-
-func isCommand(arg string) bool {
-	return strings.Index(arg, "-") == 0
 }
