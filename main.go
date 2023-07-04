@@ -40,7 +40,7 @@ func main() {
 		path = os.Args[2]
 	}
 
-	extensions, err := fileutils.GetFileExtensions(path, caseSensitive)
+	extensions, err := fileutils.GetFileExtensions(path, caseSensitive, nil)
 	if err != nil {
 		showError("GetExtensions error", err)
 		return
