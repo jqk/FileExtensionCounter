@@ -5,30 +5,43 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gookit/color"
 	"github.com/jqk/futool4go/common"
-	fileutils "github.com/jqk/futool4go/fileutils"
+	"github.com/jqk/futool4go/fileutils"
 )
 
 func showVersion() {
-	fmt.Println()
-	fmt.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	fmt.Println("file extension counter (fec) 1.0.0, 2023-07-03")
-	fmt.Println()
+	w := color.New(color.White)
+	b := color.New(color.LightBlue)
+	w.Println()
+	w.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
+	w.Print("file extension counter (")
+	b.Print("fec")
+	w.Println(") 1.0.1, 2023-07-04")
+	w.Println()
 }
 
 func showHelp() {
-	fmt.Println("Usage:")
-	fmt.Println("  fec [command] <path/to/counter/extensions>")
-	fmt.Println("\nCommand:")
-	fmt.Println("  -f, --false, or omit command: Count extensions in specified path, extension is case insensitive.")
-	fmt.Println("  -t, --true                  : Count extensions in specified path, extension is case sensitive.")
-	fmt.Println()
-	fmt.Println("  otherwise: show this help.")
-	fmt.Println()
+	w := color.New(color.LightWhite)
+	y := color.New(color.LightYellow)
+	g := color.New(color.LightGreen)
+
+	y.Println("Usage:")
+	y.Println("  fec [command] <path/to/counter/extensions>")
+	y.Println("\nCommand:")
+	y.Print("  -f, --false, or omit command: ")
+	w.Print("extensions in specified path, extension is case ")
+	g.Println("insensitive.")
+	y.Print("  -t, --true                  : ")
+	w.Print("extensions in specified path, extension is case ")
+	g.Println("sensitive.")
+	y.Println()
+	y.Println("  otherwise: show this help.")
+	y.Println()
 }
 
 func showError(header string, err error) {
-	fmt.Printf("%s: %s\n", header, err)
+	color.FgLightRed.Println("%s: %s\n", header, err)
 	os.Exit(1)
 }
 
@@ -52,11 +65,18 @@ func showExtentions(path string, caseSensitive bool, extensions []fileutils.File
 
 	path, _ = filepath.Abs(path)
 
-	fmt.Println("Searching path :", path)
-	fmt.Println("Case sensitive :", caseSensitive)
-	fmt.Println("Found file     :", fileCount)
-	fmt.Println("Found extension:", len(extensions))
-	fmt.Println()
+	g := color.New(color.Green)
+	y := color.New(color.Yellow)
+
+	g.Print("Searching path : ")
+	y.Println(path)
+	g.Print("Case sensitive : ")
+	y.Println(caseSensitive)
+	g.Print("Found file     : ")
+	y.Println(fileCount)
+	g.Print("Found extension: ")
+	y.Println(len(extensions))
+	g.Println()
 
 	if fileCount == 0 {
 		return
