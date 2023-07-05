@@ -26,14 +26,30 @@ func showVersion() {
 
 func showHelp() {
 	yellow.Println("Usage:")
-	yellow.Println("  fec [command] <path/to/counter/extensions>")
+	yellow.Println("  fec [command] <path/to/counting/extensions>")
+	white.Println("          counting extensions in specified path")
 	yellow.Println("\nCommand:")
-	yellow.Print("  -f, --false, or omit command: ")
-	white.Print("extensions in specified path, extension is case ")
-	green.Println("insensitive.")
-	yellow.Print("  -t, --true                  : ")
-	white.Print("extensions in specified path, extension is case ")
-	green.Println("sensitive.")
+	white.Println("  the first char of the command defines if the extension is case sensitive.")
+	white.Println("      't' is true, 'f' is false.")
+	white.Println("  the second one defines how to sort the result.")
+	white.Println("      'c' means sort by count.")
+	white.Println("      'n' means sort by extension.")
+	white.Println("      's' means sort by size.\n")
+
+	yellow.Print("  -fn: default command, can be omitted. ")
+	white.Println("case insensitive and sort the result by extension.")
+	yellow.Print("  -fc: ")
+	white.Println("case insensitive and sort the result by count.")
+	yellow.Print("  -fs: ")
+	white.Println("case insensitive and sort the result by size.")
+
+	yellow.Print("  -tn: ")
+	white.Println("case sensitive and sort the result by extension.")
+	yellow.Print("  -tc: ")
+	white.Println("case sensitive and sort the result by count.")
+	yellow.Print("  -ts: ")
+	white.Println("case sensitive and sort the result by size.")
+
 	yellow.Println()
 	yellow.Println("  otherwise: show this help.")
 	yellow.Println()
@@ -52,7 +68,7 @@ func showSearchingEnd() {
 	yellow.Println("Searching done.\n")
 }
 
-func showSearchStep(dirCount, fileCount, extCount int) {
+func showSearchProgress(dirCount, fileCount, extCount int) {
 	white.Print("found dir: ")
 	yellow.Printf("%6d", dirCount)
 	white.Print(",  file: ")
@@ -97,7 +113,7 @@ func showExtentions(path string, caseSensitive bool, extensions []fileutils.File
 
 	t := fmt.Sprintf("  No.  %%-%ds  %%5s   %%11s\n", extNameLength)
 	s := fmt.Sprintf(t, "Extension", "Count", "Size")
-	fmt.Println(s)
+	white.Println(s)
 
 	// 1. sequence number, right aligned.
 	// 2. extension, left aligned.
