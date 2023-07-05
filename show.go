@@ -82,9 +82,9 @@ func showExtentions(path string, caseSensitive bool,
 	extensions []fileutils.FileExtension, elapsed time.Duration) {
 
 	extNameLength := 0
-	fileCount := 0
+	seqNo := 0
 	for _, ext := range extensions {
-		fileCount += ext.Count
+		seqNo += ext.Count
 
 		n := len(ext.Name)
 		if n > extNameLength {
@@ -105,14 +105,14 @@ func showExtentions(path string, caseSensitive bool,
 	green.Print("Case sensitive : ")
 	yellow.Println(caseSensitive)
 	green.Print("Found file     : ")
-	yellow.Println(fileCount)
+	yellow.Println(seqNo)
 	green.Print("Found extension: ")
 	yellow.Println(len(extensions))
 	green.Print("Elapsed time   : ")
 	yellow.Println(elapsed)
 	green.Println()
 
-	if fileCount == 0 {
+	if seqNo == 0 {
 		return
 	}
 
@@ -123,13 +123,30 @@ func showExtentions(path string, caseSensitive bool,
 	// 1. sequence number, right aligned.
 	// 2. extension, left aligned.
 	// 3. count, right aligned.
-	// 4. size, right aliged.
-	format := fmt.Sprintf("%%5d  %%-%ds  %%5d   %%11s\n", extNameLength)
+	format := fmt.Sprintf("%%5d  %%-%ds  %%5d", extNameLength)
 
-	fileCount = 1
+	var sizeSmall int64 = 1024 * 1024 * 10
+	var sizeMiddle int64 = 1024 * 1024 * 100
+	var sizeLarge int64 = 1024 * 1024 * 1024
+
+	seqNo = 1
 	for _, ext := range extensions {
-		fmt.Printf(format, fileCount, ext.Name, ext.Count, common.ToSizeString(ext.Size))
-		fileCount++
+		var c color.Style
+
+		if ext.Size < sizeSmall {
+			c = blue
+		} else if ext.Size < sizeMiddle {
+			c = green
+		} else if ext.Size < sizeLarge {
+			c = yellow
+		} else {
+			c = color.New(color.LightRed)
+		}
+
+		blue.Printf(format, seqNo, ext.Name, ext.Count)
+		// 4. size, right aliged.
+		c.Printf("   %11s\n", common.ToSizeString(ext.Size))
+		seqNo++
 	}
 
 	fmt.Println()

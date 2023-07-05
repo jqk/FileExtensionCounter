@@ -10,8 +10,9 @@
             "request": "launch",
             "mode": "auto",
             "program": "${fileDirname}",
-            "args": ["-fc","e:/data"]
-            //"args": ["-fs","e:/data"]
+            //"args": ["-fc","e:/data"]
+            //"args": ["e:/temp"]
+            "args": ["-fs","e:/data"]
             //"args": ["-fs","e:/2data"]
             //"args": []
         }
