@@ -10,39 +10,55 @@ import (
 	"github.com/jqk/futool4go/fileutils"
 )
 
+var blue color.Style = color.New(color.LightBlue)
+var green color.Style = color.New(color.LightGreen)
+var white color.Style = color.New(color.White)
+var yellow color.Style = color.New(color.Yellow)
+
 func showVersion() {
-	w := color.New(color.White)
-	b := color.New(color.LightBlue)
-	w.Println()
-	w.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	w.Print("file extension counter (")
-	b.Print("fec")
-	w.Println(") 1.0.1, 2023-07-04")
-	w.Println()
+	white.Println()
+	white.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
+	white.Print("file extension counter (")
+	blue.Print("fec")
+	white.Println(") 1.0.2, 2023-07-05")
+	white.Println()
 }
 
 func showHelp() {
-	w := color.New(color.LightWhite)
-	y := color.New(color.LightYellow)
-	g := color.New(color.LightGreen)
-
-	y.Println("Usage:")
-	y.Println("  fec [command] <path/to/counter/extensions>")
-	y.Println("\nCommand:")
-	y.Print("  -f, --false, or omit command: ")
-	w.Print("extensions in specified path, extension is case ")
-	g.Println("insensitive.")
-	y.Print("  -t, --true                  : ")
-	w.Print("extensions in specified path, extension is case ")
-	g.Println("sensitive.")
-	y.Println()
-	y.Println("  otherwise: show this help.")
-	y.Println()
+	yellow.Println("Usage:")
+	yellow.Println("  fec [command] <path/to/counter/extensions>")
+	yellow.Println("\nCommand:")
+	yellow.Print("  -f, --false, or omit command: ")
+	white.Print("extensions in specified path, extension is case ")
+	green.Println("insensitive.")
+	yellow.Print("  -t, --true                  : ")
+	white.Print("extensions in specified path, extension is case ")
+	green.Println("sensitive.")
+	yellow.Println()
+	yellow.Println("  otherwise: show this help.")
+	yellow.Println()
 }
 
 func showError(header string, err error) {
-	color.FgLightRed.Println("%s: %s\n", header, err)
+	color.Errorf("%s: %s\n", header, err)
 	os.Exit(1)
+}
+
+func showSearchingStart() {
+	yellow.Println("Searching...")
+}
+
+func showSearchingEnd() {
+	yellow.Println("Searching done.\n")
+}
+
+func showSearchStep(dirCount, fileCount, extCount int) {
+	white.Print("found dir: ")
+	yellow.Printf("%6d", dirCount)
+	white.Print(",  file: ")
+	yellow.Printf("%7d", fileCount)
+	white.Print(",  ext: ")
+	yellow.Printf("%5d\n", extCount)
 }
 
 func showExtentions(path string, caseSensitive bool, extensions []fileutils.FileExtension) {
@@ -65,18 +81,15 @@ func showExtentions(path string, caseSensitive bool, extensions []fileutils.File
 
 	path, _ = filepath.Abs(path)
 
-	g := color.New(color.Green)
-	y := color.New(color.Yellow)
-
-	g.Print("Searching path : ")
-	y.Println(path)
-	g.Print("Case sensitive : ")
-	y.Println(caseSensitive)
-	g.Print("Found file     : ")
-	y.Println(fileCount)
-	g.Print("Found extension: ")
-	y.Println(len(extensions))
-	g.Println()
+	green.Print("Searching path : ")
+	yellow.Println(path)
+	green.Print("Case sensitive : ")
+	yellow.Println(caseSensitive)
+	green.Print("Found file     : ")
+	yellow.Println(fileCount)
+	green.Print("Found extension: ")
+	yellow.Println(len(extensions))
+	green.Println()
 
 	if fileCount == 0 {
 		return

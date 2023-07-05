@@ -11,9 +11,8 @@
             "mode": "auto",
             "program": "${fileDirname}",
             //"args": ["-t","e:/temp"]
-            //"args": ["e:/temp"]
-            "args": []
-            //"args": [ "-c" ]
+            "args": ["e:/data"]
+            //"args": []
         }
     ]
 }

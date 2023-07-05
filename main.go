@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -50,6 +49,8 @@ func main() {
 	fileCount := 0
 	extCount := 0
 
+	showSearchingStart()
+
 	go func() {
 		extensions, err = fileutils.GetFileExtensions(path, caseSensitive,
 			func(path string, info os.FileInfo, ext *fileutils.FileExtension) error {
@@ -68,8 +69,6 @@ func main() {
 		close(done)
 	}()
 
-	stepPrinted := false
-
 	for {
 		time.Sleep(sleepTime)
 
@@ -79,14 +78,12 @@ func main() {
 				showError("GetExtensions error", err)
 				return
 			}
-			if stepPrinted {
-				fmt.Println()
-			}
+
+			showSearchingEnd()
 			showExtentions(path, caseSensitive, extensions)
 			return
 		default:
-			fmt.Printf("searching...   dir: %6d,  file: %7d,  ext: %5d\n", dirCount, fileCount, extCount)
-			stepPrinted = true
+			showSearchStep(dirCount, fileCount, extCount)
 		}
 	}
 }

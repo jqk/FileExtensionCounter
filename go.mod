@@ -3,7 +3,7 @@ module fec
 
 go 1.20
 
-require github.com/jqk/futool4go v1.0.0
+require github.com/jqk/futool4go v1.0.1
 
 require github.com/gookit/color v1.5.3
 
