@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gookit/color"
 	"github.com/jqk/futool4go/common"
@@ -77,7 +78,9 @@ func showSearchProgress(dirCount, fileCount, extCount int) {
 	yellow.Printf("%5d\n", extCount)
 }
 
-func showExtentions(path string, caseSensitive bool, extensions []fileutils.FileExtension) {
+func showExtentions(path string, caseSensitive bool,
+	extensions []fileutils.FileExtension, elapsed time.Duration) {
+
 	extNameLength := 0
 	fileCount := 0
 	for _, ext := range extensions {
@@ -105,6 +108,8 @@ func showExtentions(path string, caseSensitive bool, extensions []fileutils.File
 	yellow.Println(fileCount)
 	green.Print("Found extension: ")
 	yellow.Println(len(extensions))
+	green.Print("Elapsed time   : ")
+	yellow.Println(elapsed)
 	green.Println()
 
 	if fileCount == 0 {

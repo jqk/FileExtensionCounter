@@ -6,7 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jqk/futool4go/fileutils"
+	fu "github.com/jqk/futool4go/fileutils"
+	"github.com/jqk/futool4go/timeutils"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 
 	var path string
 	var caseSensitive bool
-	var sortFunc func([]fileutils.FileExtension)
+	var sortFunc func([]fu.FileExtension)
 
 	argCount := len(os.Args)
 	if argCount == 2 {
@@ -24,7 +25,7 @@ func main() {
 		}
 
 		caseSensitive = false
-		sortFunc = fileutils.SortFileExtensionsByName
+		sortFunc = fu.SortFileExtensionsByName
 		path = os.Args[1]
 	} else if argCount != 3 {
 		showHelp()
@@ -48,57 +49,61 @@ func main() {
 
 		ch = command[2]
 		if ch == 'c' {
-			sortFunc = fileutils.SortFileExtensionsByCount
+			sortFunc = fu.SortFileExtensionsByCount
 		} else if ch == 'n' {
-			sortFunc = fileutils.SortFileExtensionsByName
+			sortFunc = fu.SortFileExtensionsByName
 		} else if ch == 's' {
-			sortFunc = fileutils.SortFileExtensionsBySize
+			sortFunc = fu.SortFileExtensionsBySize
 		} else {
 			showHelp()
 			return
 		}
 
 		path = os.Args[2]
-		exists, isDir, err := fileutils.FileExists(path)
+		exists, isDir, err := fu.FileExists(path)
 		if err != nil {
 			showError("Path error", err)
 			return
 		}
-		if !exists || isDir {
+		if !exists || !isDir {
 			showError("Path error", errors.New("given path does not exist or is a file"))
 			return
 		}
 	}
 
 	// 解析完参数，执行实际任务。
-	extensions, err := countFileExtensions(path, caseSensitive)
+	extensions, elapsed, err := countFileExtensions(path, caseSensitive)
 	if err != nil {
 		showError("Get file extensions error", err)
 		return
 	}
 
 	sortFunc(extensions)
-	showExtentions(path, caseSensitive, extensions)
+	showExtentions(path, caseSensitive, extensions, elapsed)
 }
 
 func isCommand(arg string) bool {
 	return strings.Index(arg, "-") == 0
 }
 
-func countFileExtensions(path string, caseSensitive bool) ([]fileutils.FileExtension, error) {
+func countFileExtensions(path string, caseSensitive bool) (
+	[]fu.FileExtension, time.Duration, error) {
 	showSearchingStart()
 
-	var extensions []fileutils.FileExtension
+	var extensions []fu.FileExtension
 	var err error
 
 	done := make(chan struct{})
 	dirCount := 0
 	fileCount := 0
 	extCount := 0
+	elapsed := time.Duration(0)
 
 	go func() {
-		extensions, err = fileutils.GetFileExtensions(path, caseSensitive,
-			func(path string, info os.FileInfo, ext *fileutils.FileExtension) error {
+		sw := timeutils.Stopwatch{}
+		sw.Start()
+		extensions, err = fu.GetFileExtensions(path, caseSensitive,
+			func(path string, info os.FileInfo, ext *fu.FileExtension) error {
 				if ext == nil {
 					dirCount++
 				} else {
@@ -111,6 +116,9 @@ func countFileExtensions(path string, caseSensitive bool) ([]fileutils.FileExten
 				return nil
 			})
 
+		sw.Stop()
+		elapsed = sw.ElapsedTime()
+
 		close(done)
 	}()
 
@@ -121,11 +129,11 @@ func countFileExtensions(path string, caseSensitive bool) ([]fileutils.FileExten
 		select {
 		case <-done: // 等待扩展名扫描结束。
 			if err != nil {
-				return nil, err
+				return nil, time.Duration(0), err
 			}
 
 			showSearchingEnd()
-			return extensions, nil
+			return extensions, elapsed, nil
 		default: // 扩展名扫描中，打印进度。
 			showSearchProgress(dirCount, fileCount, extCount)
 		}
