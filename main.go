@@ -16,9 +16,11 @@ func main() {
 	var path string
 	var caseSensitive bool
 	var sortFunc func([]fu.FileExtension)
+	var err error
 
 	argCount := len(os.Args)
 	if argCount == 2 {
+		// 2 个参数时，第 2 个参数必须是待查看的路径，而不是命令。
 		if isCommand(os.Args[1]) {
 			showHelp()
 			return
@@ -27,48 +29,32 @@ func main() {
 		caseSensitive = false
 		sortFunc = fu.SortFileExtensionsByName
 		path = os.Args[1]
-	} else if argCount != 3 {
-		showHelp()
-		return
-	} else { // argCount == 3
+	} else if argCount == 3 {
+		// 3 个参数时，第 2 个是命令，第 3 个是待查看的路径。
+		// 命令字符串只能是 3 个字符。
 		command := strings.ToLower(os.Args[1])
 		if len(command) != 3 || !isCommand(command) {
 			showHelp()
 			return
 		}
-
-		ch := command[1]
-		if ch == 't' {
-			caseSensitive = true
-		} else if ch == 'f' {
-			caseSensitive = false
-		} else {
+		if caseSensitive, err = getCaseSensitive(command[1]); err != nil {
 			showHelp()
 			return
 		}
-
-		ch = command[2]
-		if ch == 'c' {
-			sortFunc = fu.SortFileExtensionsByCount
-		} else if ch == 'n' {
-			sortFunc = fu.SortFileExtensionsByName
-		} else if ch == 's' {
-			sortFunc = fu.SortFileExtensionsBySize
-		} else {
+		if sortFunc, err = getSortFunc(command[2]); err != nil {
 			showHelp()
 			return
 		}
 
 		path = os.Args[2]
-		exists, isDir, err := fu.FileExists(path)
-		if err != nil {
-			showError("Path error", err)
-			return
-		}
-		if !exists || !isDir {
-			showError("Path error", errors.New("given path does not exist or is a file"))
-			return
-		}
+	} else {
+		showHelp()
+		return
+	}
+
+	if err = validatePath(path); err != nil {
+		showError("Path error", err)
+		return
 	}
 
 	// 解析完参数，执行实际任务。
@@ -82,10 +68,6 @@ func main() {
 	showExtentions(path, caseSensitive, extensions, elapsed)
 }
 
-func isCommand(arg string) bool {
-	return strings.Index(arg, "-") == 0
-}
-
 func countFileExtensions(path string, caseSensitive bool) (
 	[]fu.FileExtension, time.Duration, error) {
 	showSearchingStart()
@@ -93,12 +75,16 @@ func countFileExtensions(path string, caseSensitive bool) (
 	var extensions []fu.FileExtension
 	var err error
 
+	// 用于协程同步的通道。
 	done := make(chan struct{})
+
+	// 各个扩展名的统计信息。
 	dirCount := 0
 	fileCount := 0
 	extCount := 0
 	elapsed := time.Duration(0)
 
+	// 启动单独的协程处理扩展名。
 	go func() {
 		sw := timeutils.Stopwatch{}
 		sw.Start()
@@ -122,6 +108,7 @@ func countFileExtensions(path string, caseSensitive bool) (
 		close(done)
 	}()
 
+	// 等待扩展名扫描结束。并显示扩展名扫描进度。
 	sleepTime := 200 * time.Millisecond
 	for {
 		time.Sleep(sleepTime)
@@ -138,4 +125,42 @@ func countFileExtensions(path string, caseSensitive bool) (
 			showSearchProgress(dirCount, fileCount, extCount)
 		}
 	}
+}
+
+func isCommand(arg string) bool {
+	return strings.Index(arg, "-") == 0
+}
+
+func getCaseSensitive(ch byte) (bool, error) {
+	if ch == 't' {
+		return true, nil
+	} else if ch == 'f' {
+		return false, nil
+	} else {
+		return false, errors.New("not 't' or 'f' for case sensitive")
+	}
+}
+
+func getSortFunc(ch byte) (func([]fu.FileExtension), error) {
+	if ch == 'c' {
+		return fu.SortFileExtensionsByCount, nil
+	} else if ch == 'n' {
+		return fu.SortFileExtensionsByName, nil
+	} else if ch == 's' {
+		return fu.SortFileExtensionsBySize, nil
+	} else {
+		return nil, errors.New("not 'c', 'n' or 's' for sort method")
+	}
+}
+
+func validatePath(path string) error {
+	exists, isDir, err := fu.FileExists(path)
+	if err != nil {
+		return err
+	}
+	if !exists || !isDir {
+		return errors.New("given path does not exist or is a file")
+	}
+
+	return nil
 }
