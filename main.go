@@ -19,10 +19,13 @@ func main() {
 	var err error
 
 	argCount := len(os.Args)
-	if argCount == 2 {
+	if argCount == 1 {
+		showHelp()
+		return
+	} else if argCount == 2 {
 		// 2 个参数时，第 2 个参数必须是待查看的路径，而不是命令。
 		if isCommand(os.Args[1]) {
-			showHelp()
+			showError("Argument error", errors.New("the only one argument must be a path to search"), true)
 			return
 		}
 
@@ -34,33 +37,33 @@ func main() {
 		// 命令字符串只能是 3 个字符。
 		command := strings.ToLower(os.Args[1])
 		if len(command) != 3 || !isCommand(command) {
-			showHelp()
+			showError("Command error", errors.New("not a valid command"), true)
 			return
 		}
 		if caseSensitive, err = getCaseSensitive(command[1]); err != nil {
-			showHelp()
+			showError("Command error", err, true)
 			return
 		}
 		if sortFunc, err = getSortFunc(command[2]); err != nil {
-			showHelp()
+			showError("Command error", err, true)
 			return
 		}
 
 		path = os.Args[2]
 	} else {
-		showHelp()
+		showError("Argument error", errors.New("wrong number of argument"), true)
 		return
 	}
 
 	if err = validatePath(path); err != nil {
-		showError("Path error", err)
+		showError("Path error", err, false)
 		return
 	}
 
 	// 解析完参数，执行实际任务。
 	extensions, elapsed, err := countFileExtensions(path, caseSensitive)
 	if err != nil {
-		showError("Get file extensions error", err)
+		showError("Get file extensions error", err, false)
 		return
 	}
 

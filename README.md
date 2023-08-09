@@ -4,16 +4,21 @@ FileExtensionCounter is a command line program used to search all file extension
 
 Only tested on Windows but should also run on Linux and Mac operating systems.
 
+FileExtensionCounter 是一个命令行程序，用于搜索给定路径下的所有文件扩展名，并给出每个扩展名的文件数量和总文件大小。该程序仅在 Windows 上测试过，但也应该可以在 Linux 和 Mac 操作系统上运行。
+
 ## Usage
 
 ```bash {.line-numbers}
 $ fec
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.2, 2023-07-05
+file extension counter (fec) 1.0.3, 2023-08-09
 
 Usage:
   fec [command] <path/to/counting/extensions>
+       counting extensions in specified path
+
+Command:
   the first char of the command defines if the extension is case sensitive.
       't' is true, 'f' is false.
   the second one defines how to sort the result.
@@ -37,9 +42,11 @@ Usage:
 
 ```bash {.line-numbers}
 $ fec e:\temp
+Or
+$ fec -fn e:\temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.2, 2023-07-05
+file extension counter (fec) 1.0.3, 2023-08-09
 
 Searching...
 Searching done.
@@ -145,7 +152,7 @@ Files with uppercase "TXT" are treated differently from files with lowercase "tx
 $ fec -tn e:\temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.2, 2023-07-05
+file extension counter (fec) 1.0.3, 2023-08-09
 
 Searching...
 Searching done.

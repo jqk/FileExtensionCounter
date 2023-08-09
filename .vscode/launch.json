@@ -12,9 +12,14 @@
             "program": "${fileDirname}",
             //"args": ["-fc","e:/data"]
             //"args": ["e:/temp"]
-            "args": ["-fs","e:/data"]
-            //"args": ["-fs","e:/2data"]
-            //"args": []
+            //"args": ["-fs","e:/data"]
+            //"args": ["-fs","for path not exist error"]
+            //"args": ["-fs","e:/2data", "for wrong number of argument error"]
+            //"args": ["-for must be a path to search"]
+            //"args": ["-as","for case sensitive error"]
+            //"args": ["-ta","for sort method error"]
+            //"args": ["-tsa","for not a valid command error"]
+            "args": []
         }
     ]
 }

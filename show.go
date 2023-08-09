@@ -21,14 +21,14 @@ func showVersion() {
 	white.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
 	white.Print("file extension counter (")
 	blue.Print("fec")
-	white.Println(") 1.0.2, 2023-07-05")
+	white.Println(") 1.0.3, 2023-08-09")
 	white.Println()
 }
 
 func showHelp() {
 	yellow.Println("Usage:")
 	yellow.Println("  fec [command] <path/to/counting/extensions>")
-	white.Println("          counting extensions in specified path")
+	white.Println("       counting extensions in specified path")
 	yellow.Println("\nCommand:")
 	white.Println("  the first char of the command defines if the extension is case sensitive.")
 	white.Println("      't' is true, 'f' is false.")
@@ -56,8 +56,13 @@ func showHelp() {
 	yellow.Println()
 }
 
-func showError(header string, err error) {
-	color.Errorf("%s: %s\n", header, err)
+func showError(header string, err error, includingHelp bool) {
+	color.Errorf("%s: %s\n\n", header, err)
+
+	if includingHelp {
+		showHelp()
+	}
+
 	os.Exit(1)
 }
 
