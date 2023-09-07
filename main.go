@@ -25,7 +25,7 @@ func main() {
 	} else if argCount == 2 {
 		// 2 个参数时，第 2 个参数必须是待查看的路径，而不是命令。
 		if isCommand(os.Args[1]) {
-			showError("Argument error", errors.New("the only one argument must be a path to search"), true)
+			showError("Argument error", errors.New("the only one argument must be the path to search"), true)
 			return
 		}
 
@@ -37,7 +37,7 @@ func main() {
 		// 命令字符串只能是 3 个字符。
 		command := strings.ToLower(os.Args[1])
 		if len(command) != 3 || !isCommand(command) {
-			showError("Command error", errors.New("not a valid command"), true)
+			showError("Command error", errors.New(os.Args[1]+" is not a valid command"), true)
 			return
 		}
 		if caseSensitive, err = getCaseSensitive(command[1]); err != nil {

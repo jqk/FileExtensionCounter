@@ -12,7 +12,7 @@ FileExtensionCounter 是一个命令行程序，用于搜索给定路径下的�
 $ fec
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.3, 2023-08-09
+file extension counter (fec) 1.1.1, 2023-09-07
 
 Usage:
   fec [command] <path/to/counting/extensions>
@@ -46,7 +46,7 @@ Or
 $ fec -fn e:\temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.3, 2023-08-09
+file extension counter (fec) 1.1.1, 2023-09-07
 
 Searching...
 Searching done.
@@ -146,13 +146,13 @@ Elapsed time   : 123.126ms
 
 ### Search files extensions in case sensitive manner
 
-Files with uppercase "TXT" are treated differently from files with lowercase "txt".
+Files with uppercase extension `.TXT` are treated differently from files with lowercase `.txt`.
 
 ```bash {.line-numbers}
 $ fec -tn e:\temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.3, 2023-08-09
+file extension counter (fec) 1.1.1, 2023-09-07
 
 Searching...
 Searching done.
@@ -257,7 +257,7 @@ Elapsed time   : 123.126ms
 $ fec -ts e:\temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.0.2, 2023-07-05
+file extension counter (fec) 1.1.1, 2023-09-07
 
 Searching...
 Searching done.

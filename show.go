@@ -21,7 +21,7 @@ func showVersion() {
 	white.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
 	white.Print("file extension counter (")
 	blue.Print("fec")
-	white.Println(") 1.0.3, 2023-08-09")
+	white.Println(") 1.1.1, 2023-09-07")
 	white.Println()
 }
 
@@ -57,7 +57,8 @@ func showHelp() {
 }
 
 func showError(header string, err error, includingHelp bool) {
-	color.Errorf("%s: %s\n\n", header, err)
+	color.Errorf("%s: %s", header, err)
+	white.Println("\n")
 
 	if includingHelp {
 		showHelp()
