@@ -14,64 +14,56 @@ func main() {
 	showVersion()
 
 	var path string
-	var caseSensitive bool
 	var sortFunc func([]fu.FileExtension)
 	var err error
 
+	option := fu.NewWalkExtensionOption()
 	argCount := len(os.Args)
+
 	if argCount == 1 {
 		showHelp()
 		return
 	} else if argCount == 2 {
-		// 2 个参数时，第 2 个参数必须是待查看的路径，而不是命令。
-		if isCommand(os.Args[1]) {
-			showError("Argument error", errors.New("the only one argument must be the path to search"), true)
-			return
-		}
-
-		caseSensitive = false
 		sortFunc = fu.SortFileExtensionsByName
 		path = os.Args[1]
-	} else if argCount == 3 {
-		// 3 个参数时，第 2 个是命令，第 3 个是待查看的路径。
-		// 命令字符串只能是 3 个字符。
-		command := strings.ToLower(os.Args[1])
-		if len(command) != 3 || !isCommand(command) {
-			showError("Command error", errors.New(os.Args[1]+" is not a valid command"), true)
-			return
-		}
-		if caseSensitive, err = getCaseSensitive(command[1]); err != nil {
-			showError("Command error", err, true)
-			return
-		}
-		if sortFunc, err = getSortFunc(command[2]); err != nil {
-			showError("Command error", err, true)
-			return
+	} else if argCount == 6 {
+		// os.Args[0] 是程序自己的名字。
+		// os.Args[1] 到 os.Args[3] 是 3 个 bool 类型的参数。正好对应 option 的 3 个成员。
+		if err = setOption(option, os.Args); err != nil {
+			showError("Option error", err, true)
+			os.Exit(1)
 		}
 
-		path = os.Args[2]
+		// os.Args[4] 是排序方法。
+		if sortFunc, err = getSortFunc(os.Args[4]); err != nil {
+			showError("Option error", err, true)
+			os.Exit(1)
+		}
+
+		// os.Args[5] 是路径。
+		path = os.Args[5]
 	} else {
 		showError("Argument error", errors.New("wrong number of argument"), true)
-		return
+		os.Exit(1)
 	}
 
 	if err = validatePath(path); err != nil {
 		showError("Path error", err, false)
-		return
+		os.Exit(2)
 	}
 
 	// 解析完参数，执行实际任务。
-	extensions, elapsed, err := countFileExtensions(path, caseSensitive)
+	extensions, elapsed, err := countFileExtensions(path, option)
 	if err != nil {
 		showError("Get file extensions error", err, false)
-		return
+		os.Exit(3)
 	}
 
 	sortFunc(extensions)
-	showExtentions(path, caseSensitive, extensions, elapsed)
+	showExtentions(path, option, extensions, elapsed)
 }
 
-func countFileExtensions(path string, caseSensitive bool) (
+func countFileExtensions(path string, option *fu.WalkExtensionOption) (
 	[]fu.FileExtension, time.Duration, error) {
 	showSearchingStart()
 
@@ -91,7 +83,7 @@ func countFileExtensions(path string, caseSensitive bool) (
 	go func() {
 		sw := timeutils.Stopwatch{}
 		sw.Start()
-		extensions, err = fu.GetFileExtensions(path, caseSensitive,
+		extensions, err = fu.GetFileExtensions(path, option,
 			func(path string, info os.FileInfo, ext *fu.FileExtension) error {
 				if ext == nil {
 					dirCount++
@@ -130,29 +122,40 @@ func countFileExtensions(path string, caseSensitive bool) (
 	}
 }
 
-func isCommand(arg string) bool {
-	return strings.Index(arg, "-") == 0
-}
+func setOption(option *fu.WalkExtensionOption, args []string) error {
+	boolValues := make([]bool, 3)
 
-func getCaseSensitive(ch byte) (bool, error) {
-	if ch == 't' {
-		return true, nil
-	} else if ch == 'f' {
-		return false, nil
-	} else {
-		return false, errors.New("not 't' or 'f' for case sensitive")
+	for i := 1; i < 4; i++ {
+		arg := strings.ToLower(args[i])
+		if arg == "-f" {
+			boolValues[i-1] = false
+		} else if arg == "-t" {
+			boolValues[i-1] = true
+		} else {
+			return errors.New(args[i] + " is not a valid option")
+		}
 	}
+
+	if !boolValues[0] {
+		option.PathErrorHandler = nil
+	}
+	option.CaseSensitive = boolValues[1]
+	option.Recursive = boolValues[2]
+
+	return nil
 }
 
-func getSortFunc(ch byte) (func([]fu.FileExtension), error) {
-	if ch == 'c' {
+func getSortFunc(arg string) (func([]fu.FileExtension), error) {
+	arg = strings.ToLower(arg)
+
+	if arg == "-c" {
 		return fu.SortFileExtensionsByCount, nil
-	} else if ch == 'n' {
+	} else if arg == "-e" {
 		return fu.SortFileExtensionsByName, nil
-	} else if ch == 's' {
+	} else if arg == "-s" {
 		return fu.SortFileExtensionsBySize, nil
 	} else {
-		return nil, errors.New("not 'c', 'n' or 's' for sort method")
+		return nil, errors.New("not 'c', 'e' or 's' for sort method")
 	}
 }
 

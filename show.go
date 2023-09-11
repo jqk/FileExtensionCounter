@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -21,38 +20,33 @@ func showVersion() {
 	white.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
 	white.Print("file extension counter (")
 	blue.Print("fec")
-	white.Println(") 1.1.1, 2023-09-07")
+	white.Println(") 1.2.0, 2023-09-11")
 	white.Println()
 }
 
 func showHelp() {
 	yellow.Println("Usage:")
-	yellow.Println("  fec [command] <path/to/counting/extensions>")
+	yellow.Println("  fec [<byPassPermissionError> <caseSensitive> <recursive> <sortMethod>] <path/to/counting/extensions>")
 	white.Println("       counting extensions in specified path")
-	yellow.Println("\nCommand:")
-	white.Println("  the first char of the command defines if the extension is case sensitive.")
-	white.Println("      't' is true, 'f' is false.")
-	white.Println("  the second one defines how to sort the result.")
-	white.Println("      'c' means sort by count.")
-	white.Println("      'n' means sort by extension.")
-	white.Println("      's' means sort by size.\n")
+	yellow.Println("\nOptions:")
+	white.Print("  All options must be either specified in order or omitted. Default values are used when omitted: ")
+	yellow.Println("-t -f -t -e\n")
 
-	yellow.Print("  -fn: default command, can be omitted. ")
-	white.Println("case insensitive and sort the result by extension.")
-	yellow.Print("  -fc: ")
-	white.Println("case insensitive and sort the result by count.")
-	yellow.Print("  -fs: ")
-	white.Println("case insensitive and sort the result by size.")
-
-	yellow.Print("  -tn: ")
-	white.Println("case sensitive and sort the result by extension.")
-	yellow.Print("  -tc: ")
-	white.Println("case sensitive and sort the result by count.")
-	yellow.Print("  -ts: ")
-	white.Println("case sensitive and sort the result by size.")
+	yellow.Print("  byPassPermissionError: ")
+	white.Println("-t is true, skip the permission error; -f is false, throw an error.")
+	yellow.Print("  caseSensitive        : ")
+	white.Println("-t is true, the extension is case sensitive; -f is false, the extension is case insensitive.")
+	yellow.Print("  recursive            : ")
+	white.Println("-t is true, sub directories are included; -f is false, sub directories are excluded.")
+	yellow.Print("  sortMethod           : ")
+	white.Println("how to sort the result.")
+	white.Println("                         '-c' means sort by count.")
+	white.Println("                         '-e' means sort by extension.")
+	white.Println("                         '-s' means sort by size.\n")
 
 	yellow.Println()
 	yellow.Println("  otherwise: show this help.")
+	yellow.Println("  see <https://github.com/jqk/FileExtensionCounter> for more information.")
 	yellow.Println()
 }
 
@@ -63,8 +57,6 @@ func showError(header string, err error, includingHelp bool) {
 	if includingHelp {
 		showHelp()
 	}
-
-	os.Exit(1)
 }
 
 func showSearchingStart() {
@@ -84,7 +76,7 @@ func showSearchProgress(dirCount, fileCount, extCount int) {
 	yellow.Printf("%5d\n", extCount)
 }
 
-func showExtentions(path string, caseSensitive bool,
+func showExtentions(path string, option *fileutils.WalkExtensionOption,
 	extensions []fileutils.FileExtension, elapsed time.Duration) {
 
 	extNameLength := 0
@@ -106,15 +98,19 @@ func showExtentions(path string, caseSensitive bool,
 
 	path, _ = filepath.Abs(path)
 
-	green.Print("Searching path : ")
+	green.Print("Searching path          : ")
 	yellow.Println(path)
-	green.Print("Case sensitive : ")
-	yellow.Println(caseSensitive)
-	green.Print("Found file     : ")
+	green.Print("Bypass permission error : ")
+	yellow.Println(option.PathErrorHandler != nil)
+	green.Print("Case sensitive          : ")
+	yellow.Println(option.CaseSensitive)
+	green.Print("Recursive               : ")
+	yellow.Println(option.Recursive)
+	green.Print("Found file              : ")
 	yellow.Println(seqNo)
-	green.Print("Found extension: ")
+	green.Print("Found extension         : ")
 	yellow.Println(len(extensions))
-	green.Print("Elapsed time   : ")
+	green.Print("Elapsed time            : ")
 	yellow.Println(elapsed)
 	green.Println()
 
