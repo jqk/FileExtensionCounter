@@ -12,24 +12,25 @@ FileExtensionCounter 是一个命令行程序，用于搜索给定路径下的�
 $ fec
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.2.0, 2023-09-11
-
-Argument error: wrong number of argument
+file extension counter (fec) 1.2.1, 2023-09-11
 
 Usage:
-  fec [<byPassPermissionError> <caseSensitive> <recursive> <sortMethod>] <path/to/counting/extensions>
-       counting extensions in specified path
+  fec [<bypassPermissionError> <caseSensitive> <recursive> <sortMethod>] <path/to/counting/extensions>
+       counting extensions in specified path.
 
 Options:
   All options must be either specified in order or omitted. Default values are used when omitted: -t -f -t -e
 
-  byPassPermissionError: -t is true, skip the permission error (default); -f is false, throw an error
-  caseSensitive        : -t is true, the extension is case sensitive; -f is false, the extension is case insensitive (default)
-  recursive            : -t is true, sub directories are included (default); -f is false, sub directories are excluded
-  sortMethod           : how to sort the result
-                         -c means sort by count
-                         -e means sort by extension (default)
-                         -s means sort by size
+  bypassPermissionError: -t is true, skip the permission error (default).
+                         -f is false, throw an error.
+  caseSensitive        : -t is true, the extension is case sensitive.
+                         -f is false, the extension is case insensitive (default).
+  recursive            : -t is true, sub directories are included (default).
+                         -f is false, sub directories are excluded.
+  sortMethod           : how to sort the result.
+                         -c means sort by count.
+                         -e means sort by extension (default).
+                         -s means sort by size.
 
 Otherwise: show this help.
 See <https://github.com/jqk/FileExtensionCounter> for more information.
@@ -45,7 +46,7 @@ Or
 $ fec -t -f -t -e e:\temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.2.0, 2023-09-11
+file extension counter (fec) 1.2.1, 2023-09-11
 
 Searching...
 Searching done.
@@ -87,7 +88,7 @@ Files with uppercase extension `.TXT` are treated differently from files with lo
 $ fec -t -t -t -e e:/temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.2.0, 2023-09-11
+file extension counter (fec) 1.2.1, 2023-09-11
 
 Searching...
 Searching done.
@@ -128,7 +129,7 @@ Elapsed time            : 69.1037ms
 $ fec -t -t -t -s e:/temp
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file extension counter (fec) 1.2.0, 2023-09-11
+file extension counter (fec) 1.2.1, 2023-09-11
 
 Searching...
 Searching done.
