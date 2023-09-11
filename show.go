@@ -33,21 +33,27 @@ func showHelp() {
 	yellow.Println("-t -f -t -e\n")
 
 	yellow.Print("  byPassPermissionError: ")
-	white.Println("-t is true, skip the permission error; -f is false, throw an error.")
+	white.Print("-t is true, skip the permission error ")
+	yellow.Print("(default)")
+	white.Println("; -f is false, throw an error")
 	yellow.Print("  caseSensitive        : ")
-	white.Println("-t is true, the extension is case sensitive; -f is false, the extension is case insensitive.")
+	white.Print("-t is true, the extension is case sensitive; -f is false, the extension is case insensitive ")
+	yellow.Println("(default)")
 	yellow.Print("  recursive            : ")
-	white.Println("-t is true, sub directories are included; -f is false, sub directories are excluded.")
+	white.Print("-t is true, sub directories are included ")
+	yellow.Print("(default)")
+	white.Println("; -f is false, sub directories are excluded")
 	yellow.Print("  sortMethod           : ")
-	white.Println("how to sort the result.")
-	white.Println("                         '-c' means sort by count.")
-	white.Println("                         '-e' means sort by extension.")
-	white.Println("                         '-s' means sort by size.\n")
+	white.Println("how to sort the result")
+	white.Println("                         -c means sort by count")
+	white.Print("                         -e means sort by extension ")
+	yellow.Println("(default)")
+	white.Println("                         -s means sort by size\n")
 
-	yellow.Println()
-	yellow.Println("  otherwise: show this help.")
-	yellow.Println("  see <https://github.com/jqk/FileExtensionCounter> for more information.")
-	yellow.Println()
+	white.Println("Otherwise: show this help")
+	white.Print("See <")
+	yellow.Print("https://github.com/jqk/FileExtensionCounter")
+	white.Println("> for more information\n")
 }
 
 func showError(header string, err error, includingHelp bool) {
@@ -79,9 +85,11 @@ func showSearchProgress(dirCount, fileCount, extCount int) {
 func showExtentions(path string, option *fileutils.WalkExtensionOption,
 	extensions []fileutils.FileExtension, elapsed time.Duration) {
 
+	size := int64(0)
 	extNameLength := 0
 	seqNo := 0
 	for _, ext := range extensions {
+		size += ext.Size
 		seqNo += ext.Count
 
 		n := len(ext.Name)
@@ -110,6 +118,8 @@ func showExtentions(path string, option *fileutils.WalkExtensionOption,
 	yellow.Println(seqNo)
 	green.Print("Found extension         : ")
 	yellow.Println(len(extensions))
+	green.Print("Total size              : ")
+	yellow.Println(common.ToSizeString(size))
 	green.Print("Elapsed time            : ")
 	yellow.Println(elapsed)
 	green.Println()
